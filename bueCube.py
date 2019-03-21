@@ -74,38 +74,24 @@ class GiikerMove():
 
 
 
-def kobo_on_state_change(giiker_state):
+def on_state_change(giiker_state):
     global remote_control, move_history
 
-    last_move = giiker_state.last_move
-    move_history.append(last_move)
+    print("state changed")
 
-    if last_move.amount == 1:
-        kobo.next_page()
-    elif last_move.amount == -1:
-        kobo.previous_page()
 
-def alg_just_applied(alg):
-    if len(move_history) < len(alg):
-        return False
+    #last_move = giiker_state.last_move
+    #move_history.append(last_move)
 
-    for correct_move_str, actual_move in zip(alg, move_history[-len(alg):]):
-        if correct_move_str != str(actual_move):
-            return False
+    #if last_move.amount == 1:
+    #    kobo.next_page()
+    #elif last_move.amount == -1:
+    #    kobo.previous_page()
 
-    return True
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=["kodi", "kobo"])
-    args = parser.parse_args()
-
-    if args.mode == "kodi":
-        giiker.initialize(on_state_change=kodi_on_state_change)
-    elif args.mode == "kobo":
-        giiker.initialize(on_state_change=kobo_on_state_change)
-    else:
-        assert False
+    initialize(on_state_change=on_state_change)
+    
 
 if __name__ == "__main__":
     print("starting")
