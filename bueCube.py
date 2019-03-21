@@ -78,7 +78,7 @@ def on_state_change(giiker_state):
     global remote_control, move_history
 
     print("state changed")
-
+    print(giiker_state.last_move)
 
     #last_move = giiker_state.last_move
     #move_history.append(last_move)
