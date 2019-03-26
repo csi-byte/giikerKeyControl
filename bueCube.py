@@ -3,7 +3,7 @@ import gatt
 
 def initialize(on_state_change):
     manager = gatt.DeviceManager(adapter_name='hci0')
-    device = GiikerDevice(mac_address='C2:DD:1F:F8:CB:DA', manager=manager, on_state_change=on_state_change)
+    device = GiikerDevice(mac_address='D8:47:AB:04:8A:78', manager=manager, on_state_change=on_state_change)
     print("Connecting... ", end="")
     device.connect()
     print("connected!")
@@ -13,6 +13,8 @@ def initialize(on_state_change):
 
 class GiikerDevice(gatt.Device):
     def __init__(self, *args, on_state_change=None, **kwargs):
+
+        
         super().__init__(*args, **kwargs)
         self._on_state_change = on_state_change
 
@@ -34,9 +36,32 @@ class GiikerDevice(gatt.Device):
         cube_service_uuid = "0000aadb-0000-1000-8000-00805f9b34fb"
         cube_characteristic_uuid = "0000aadc-0000-1000-8000-00805f9b34fb"
         (cube_characteristic,) = [ characteristic for service in self.services for characteristic in service.characteristics if service.uuid == cube_service_uuid and characteristic.uuid == cube_characteristic_uuid ]
+	
+        self.original =  cube_characteristic.read_value()
         cube_characteristic.enable_notifications()
 
     def characteristic_value_updated(self, characteristic, value):
+        #if self.original == value:
+        #    print("ouf")
+        if (self.original != 0 ):
+
+        
+            same = True
+            for i in range(0,20):
+                if (self.original[i] != value[i]) :
+                    print("diff")
+                    same = False
+                
+
+            
+            if (same) :
+                print('Skipping extra first event.')
+                
+                return 1
+            else:
+                self.original = value
+        
+
         giiker_state = GiikerState(value)
         if self._on_state_change is not None:
             self._on_state_change(giiker_state)
