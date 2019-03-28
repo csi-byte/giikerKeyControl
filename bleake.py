@@ -13,13 +13,18 @@ class GiikerMove():
         amount = value % 16
 
         self.face = ["?", "B", "D", "L", "U", "R", "F"][face]
+        self.amount = [0, 1, 2, -1][amount]
+    
+    def __str__(self):
+        return self.face + { 0: "0", 1: "", 2: "2", -1: "'" }[self.amount]
         
 
 
 def change_handle(sender, data):
-	print(data)
-
-
+    moves = list(map(GiikerMove, data[16:]))
+    last_move = moves[0]
+    print(last_move.__str__()) #to get the letter + the direction
+    
 
 async def run(address, loop):
     async with BleakClient(address, loop=loop) as client:
@@ -27,11 +32,14 @@ async def run(address, loop):
 
 
 
-        print("len : ", len(value))
-        print("Model Number: {0}".format("".join(map(chr, value))))
+        print("len initial vavlue : ", len(value))
+        print("initial vavlue : {0}".format("".join(map(chr, value))))
         recent_moves = list(map(GiikerMove, value[16:]))
         last_move = recent_moves[0]
-        print(last_move.face)
+        print(last_move)
+
+
+        print("listening cube : ")
         await client.start_notify(MODEL_NBR_UUID, change_handle)
         while True:
         	await asyncio.sleep(5)

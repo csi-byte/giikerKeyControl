@@ -36,32 +36,9 @@ class GiikerDevice(gatt.Device):
         cube_service_uuid = "0000aadb-0000-1000-8000-00805f9b34fb"
         cube_characteristic_uuid = "0000aadc-0000-1000-8000-00805f9b34fb"
         (cube_characteristic,) = [ characteristic for service in self.services for characteristic in service.characteristics if service.uuid == cube_service_uuid and characteristic.uuid == cube_characteristic_uuid ]
-	
-        self.original =  cube_characteristic.read_value()
         cube_characteristic.enable_notifications()
 
     def characteristic_value_updated(self, characteristic, value):
-        #if self.original == value:
-        #    print("ouf")
-        if (self.original != 0 ):
-
-        
-            same = True
-            for i in range(0,20):
-                if (self.original[i] != value[i]) :
-                    print("diff")
-                    same = False
-                
-
-            
-            if (same) :
-                print('Skipping extra first event.')
-                
-                return 1
-            else:
-                self.original = value
-        
-
         giiker_state = GiikerState(value)
         if self._on_state_change is not None:
             self._on_state_change(giiker_state)
@@ -88,7 +65,7 @@ class GiikerMove():
 
         self.face = ["?", "B", "D", "L", "U", "R", "F"][face]
         self.amount = [0, 1, 2, -1][amount]
-
+    
     def __str__(self):
         return self.face + { 0: "0", 1: "", 2: "2", -1: "'" }[self.amount]
 
@@ -103,7 +80,7 @@ def on_state_change(giiker_state):
     global remote_control, move_history
 
     print("state changed")
-    print(giiker_state.last_move)
+    print(giiker_state.last_move.__str__())  #to get the letter + the direction
 
     #last_move = giiker_state.last_move
     #move_history.append(last_move)
